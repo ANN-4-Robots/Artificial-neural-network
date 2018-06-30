@@ -10,5 +10,7 @@
 int main() {
     srand( time( NULL ) );
 
+    Neuralnet<float> nn;
+    
     return 0;
 }

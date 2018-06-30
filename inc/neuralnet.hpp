@@ -4,27 +4,32 @@
 using namespace std;
 
 class Perceptron {
-
+    float bias;
 };
 
 template< typename type >
 class Neuralnet {
-
+    public:
     vector <type> input;
     vector <type> output;
-    vector <Perceptron> hiddenLayer;
 
-    int *ih_weight;
+
+    Matrix <type> *weights;
 
     Neuralnet ( unsigned int inputCount = 2, 
-                unsigned int hiddenLayerCount = 3,
                 unsigned int outputCount = 2 ) {
 
                     input.resize ( inputCount + 1 );        //Vector holding all input values and bias = 1
                     input.resize ( outputCount );
-                    hiddenLayer.resize ( hiddenLayerCount );
 
-                    ih_weight = new Matrix <type> ( 1, inputCount + 1 );
+                    weights = new Matrix <type> ( inputCount + 1, outputCount );
+                    weights->randomize ( 1, -1 );
+
+                    // for ( int i = 0; i < outputCount; ++i ) {
+                    //     weights[]
+                    // }
+
+                    cout << *weights;
                 }
 };
 
