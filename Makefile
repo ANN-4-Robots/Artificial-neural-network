@@ -7,7 +7,7 @@ TARGET := bin/neat
 SRCEXT := cpp
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g -Wall -pedantic -std=c++11 
+CFLAGS := -g -Wall -pedantic --std=c++17
 OGLFLAGS := -lsfml-graphics -lsfml-window -lsfml-system
 INC := -I inc 
 
