@@ -14,9 +14,10 @@ int main() {
     NeuralNet nn( 3, {5,3,5}, 2 );
 
     Matrix<float> inputs( {{1,2,3}} );
+    Matrix<float> expected( {{0.2,0.9}} );
     try {
         std::cout << nn.feedforward( inputs.T() );
-        nn.train( inputs.T() , {{2,4}} );
+        nn.train( inputs.T() , expected.T() );
     } catch ( char const* error ) {
         std::cout << error << std::endl;
     }

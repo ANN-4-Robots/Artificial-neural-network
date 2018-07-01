@@ -74,14 +74,17 @@ class NeuralNet {
         return output;
     }
 
-    void train ( Matrix <float> inputs, Matrix <float> outputs ) {
+    void train ( Matrix <float> inputs, Matrix <float> expectedResults ) {
         // Get valued calculated by current state of NN
         Matrix <float> results = feedforward( inputs );
+        // std::cout << expectedResults.getSize().first << "\t" << expectedResults.getSize().second << std::endl;
+        // std::cout << results.getSize().first << "\t" << results.getSize().second << std::endl;
 
-        std::cout << inputs.GetSize().first << "\t" << inputs.GetSize().second << std::endl;
         // Calculate the error of NN's output
-        Matrix <float> error = outputs - results;
+        Matrix <float> error = expectedResults - results;
 
+        // std::cout << error;
+        
     }
 };
 
