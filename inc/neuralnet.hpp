@@ -1,7 +1,7 @@
 #ifndef NEURALNET_HPP_
 #define NEURALNET_HPP_
 
-#include "matrix.hpp"
+// #include "matrix.hpp"
 
 class NeuralNet {
     int hLayers;
@@ -72,6 +72,16 @@ class NeuralNet {
         auto output = *hWages.rbegin() * *hValues.rbegin() + *biases.rbegin();
         output.map( sigmoid );
         return output;
+    }
+
+    void train ( Matrix <float> inputs, Matrix <float> outputs ) {
+        // Get valued calculated by current state of NN
+        Matrix <float> results = feedforward( inputs );
+
+        std::cout << inputs.GetSize().first << "\t" << inputs.GetSize().second << std::endl;
+        // Calculate the error of NN's output
+        Matrix <float> error = outputs - results;
+
     }
 };
 

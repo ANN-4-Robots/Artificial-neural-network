@@ -1,10 +1,6 @@
 #ifndef MATRIX_HPP_
 #define MATRIX_HPP_
 
-#include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <cmath>
 
 template <class U>
 class Matrix {
@@ -67,7 +63,7 @@ Matrix<U>::Matrix( int rows_, int cols_ ) {
 
 template <class U>
 std::pair<int, int> Matrix<U>::getSize() {
-    return std::pair(rows,cols);
+    return std::pair<int, int> (rows,cols);
 }
 
 template <class U>
