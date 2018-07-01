@@ -6,7 +6,7 @@
 int main() {
     srand( time( NULL ) );
 
-    NeuralNet nn( 3, 5, 1 );
+    NeuralNet nn( 3, {5,3,5}, 1 );
 
     Matrix<float> inputs( {{1,3,5}} );
     try {
