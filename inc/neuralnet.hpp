@@ -38,7 +38,7 @@ class NeuralNet {
         // and the rest
         for (; itr != hNums.end(); ++itr ) {
             hValues.emplace_back( *itr, 1 );
-            hWages.emplace_back( *itr, *itr-1 );
+            hWages.emplace_back( *itr, *(itr-1) );
         }
         // and the output wages
         hWages.emplace_back( outputsNum, *(hNums.end()-1) );
