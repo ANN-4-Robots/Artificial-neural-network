@@ -59,7 +59,7 @@ class NeuralNet {
     // without biases
     Matrix<float> feedforward( Matrix<float> inputs ) {
         // Sigmoid function
-        auto sigmoid = []( float& x ){ return 1/(1+pow(M_E,-x)); };
+        auto sigmoid = []( float& x ){ x = 1/(1+pow(M_E,-x)); };
         // get the value for the first hidden layer
         hValues[0] = hWages[0] * inputs + biases[0];
         hValues[0].map( sigmoid );
