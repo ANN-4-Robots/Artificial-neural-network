@@ -75,16 +75,27 @@ class NeuralNet {
     }
 
     void train ( Matrix <float> inputs, Matrix <float> expectedResults ) {
+        // Vectors of matrices holding error values of each layer 
+        std::vector< Matrix<float> > errors;
+        errors.resize( hWages.size() );
+
         // Get valued calculated by current state of NN
-        Matrix <float> results = feedforward( inputs );
-        // std::cout << expectedResults.getSize().first << "\t" << expectedResults.getSize().second << std::endl;
-        // std::cout << results.getSize().first << "\t" << results.getSize().second << std::endl;
+        Matrix <float> results = feedforward ( inputs );
 
         // Calculate the error of NN's output
         Matrix <float> error = expectedResults - results;
+        // std::cout << error.getSize().first << "\t" << error.getSize().second << std::endl;
 
-        // std::cout << error;
-        
+        // Get the error value of last layer
+        Matrix <float> outputError = hWages.back().T() * error;
+        errors.emplace_back( outputError );
+
+        // Calculate the errors of hidden layers
+        for ( int i = hWages.size(); i > 1; --i ) {
+            errors[i - 1] = hWages[i - 2].T() * errors[i];
+        }
+        for(int i = errors.size(); i > 0; --i) 
+            std::cout << errors[i] << "\n\n";
     }
 };
 
