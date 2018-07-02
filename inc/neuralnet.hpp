@@ -7,14 +7,14 @@ class NeuralNet {
     int hLayers;
     int iNum;
     int oNum;
-    const float learnRate = 0.05;
+    float learnRate;
 
     std::vector< Matrix<float> > hValues;
     std::vector< Matrix<float> > hWages;
     std::vector< Matrix<float> > biases;
 
     public:
-    NeuralNet( int inputsNum, int hiddenNum, int outputsNum ) {
+    NeuralNet( int inputsNum, int hiddenNum, int outputsNum ) :learnRate{0.5} {
         iNum = inputsNum;
         hLayers = 1;
         oNum = outputsNum;
@@ -30,7 +30,7 @@ class NeuralNet {
             matrix.randomize( 1, -1 );
     }
 
-    NeuralNet ( int inputsNum, std::initializer_list<int> hNums, int outputsNum ) {
+    NeuralNet ( int inputsNum, std::initializer_list<int> hNums, int outputsNum ) :learnRate{0.5} {
         iNum = inputsNum;
         hLayers = hNums.size();
         oNum = outputsNum;
@@ -82,25 +82,21 @@ class NeuralNet {
         // Sigmoid derivative function
         auto dSigmoid = []( float& x ){ x = x*(1-x); };
 
-        // Vectors of matrices holding error values of each layer 
-        std::vector< Matrix<float> > errors;
-        errors.resize( hWages.size() );
-
         // Get valued calculated by current state of NN
         Matrix <float> results = feedforward ( inputs );
 
+        // Vectors of matrices holding error values of each layer 
+        std::vector< Matrix<float> > errors;
+        errors.resize( hWages.size() );
         // Calculate the error of NN's output
         Matrix <float> error = expectedResults - results;
-
-        // // Get the error value of last layer
-        // Matrix <float> outputError = hWages.back().T() * error;
-        // errors.emplace_back( outputError );
         errors.back() = error;
 
         // Calculate the errors of hidden layers
         for ( int i = errors.size() - 1; i > 0; --i ) {
             errors[i - 1] = hWages[i].T() * errors[i];
         }
+
         // Back propagate wages towards it's gradient
         // Last wages
         results.map( dSigmoid );
@@ -122,10 +118,10 @@ class NeuralNet {
         deltaBias = Matrix <float>::elementwise( hValues.front(), errors.front() ) * learnRate;
         hWages.front() = hWages.front() + deltaWage;
         biases.front() = biases.front() + deltaBias;
-        // for( uint i = 0; i < errors.size(); ++i ) {
-        //     std::cout <<"Wages Matrix:\n" <<  hWages[i] << "\n";
-        //     std::cout <<"Errors Vector:\n" << errors[i] << "\n\n";
-        // }
+    }
+
+    void setLearnRate( float lr ) {
+        learnRate = lr;
     }
 };
 

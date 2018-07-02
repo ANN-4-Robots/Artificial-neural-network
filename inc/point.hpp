@@ -3,13 +3,33 @@
 
 const int width = 800, height = 800;
 
-const float A = 0.25;
-const float B = 0;
+const float A = 1;
+const float B = 200;
+
+const float C = 1;
+const float D = -200;
+
+const float E = -2;
+const float F = 50;
+
+const float G = -2;
+const float H = -50;
+
 const float Bias = 1;
 
-float f( float x ) {
-    return A*x + B;
+float f1( float x ) {
+    return A* x + B;
 }
+float f2( float x ) {
+    return C* x + D;
+}
+float f3( float x ) {
+    return E* x + F;
+}
+float f4( float x ) {
+    return G* x + H;
+}
+
 
 struct Point {
     Matrix<float> coords;
@@ -27,7 +47,8 @@ struct TrainP :public Point {
     sf::CircleShape body;
 
     TrainP() : Point() {
-        ( coords[1][0] < f( coords[0][0] ) ) ?
+        ( coords[1][0] < f1( coords[0][0] ) &&
+          coords[1][0] > f2( coords[0][0] ) ) ?
             isAbove = false :
             isAbove = true;
 

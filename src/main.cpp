@@ -11,14 +11,22 @@
 
 int main() {
     srand( time( NULL ) );
-    fpsClock clock(60);
+    fpsClock clock(1);
     sf::RenderWindow win ( sf::VideoMode( width, height ), "Neural Net");
 
-    NeuralNet nn( 2, 1, 1 );
+    NeuralNet nn( 2, 2, 1 );
+    nn.setLearnRate(0.5);
     try {
         std::vector< TrainP > drawSet;
         for ( int i = 0; i < 2000; ++i )
             drawSet.emplace_back();
+        // for ( int j = 0; j < 1000; ++j ) {
+        //     for ( int i = 0; i < 10000; ++i ) {
+        //         TrainP trainP;
+        //         nn.train( trainP.coords, Matrix<float>( {{ (trainP.isAbove) ? 1.f : 0.f }} ) );
+        //     }
+        //     std::cout << j << std::endl;
+        // }
 
         while ( win.isOpen() ) {
             if ( clock.tick() ) {
@@ -29,7 +37,7 @@ int main() {
                 }
 
                 // Training untill
-                for ( int i = 0; i < 1; ++i ) {
+                for ( int i = 0; i < 100; ++i ) {
                     TrainP trainP;
                     nn.train( trainP.coords, Matrix<float>( {{ float(trainP.isAbove) }} ) );
                 }
