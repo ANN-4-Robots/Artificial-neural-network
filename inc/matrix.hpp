@@ -92,9 +92,9 @@ void Matrix<U>::randomize( U upper_bound, U lower_bound ) {
 }
 template <class U>
 Matrix<U> Matrix<U>::elementwise( Matrix first, Matrix second ) {
-    if ( first.cols != second.cols && first.rows != second.rows )
+    if ( first.cols != second.cols || first.rows != second.rows )
         throw "SIZE_NO_MATCH";
-    Matrix<U> result;
+    Matrix<U> result( first.rows, first.cols );
     for ( int i = 0; i < first.rows; ++i ) {
         for ( int j = 0; j < first.cols; ++j ) {
             result[i][j] = first[i][j] * second[i][j];
@@ -168,7 +168,7 @@ Matrix<U> Matrix<U>::operator* ( Matrix second ) {
 
 template <class U>
 Matrix<U> Matrix<U>::operator+ ( Matrix second ) {
-    if ( rows != second.rows && cols != second.cols )
+    if ( rows != second.rows || cols != second.cols )
         throw "SIZE_NO_MATCH";
 
     Matrix result(rows, cols);
