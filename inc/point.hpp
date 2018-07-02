@@ -1,13 +1,13 @@
 #ifndef POINT_HPP_
 #define POINT_HPP_
 
-const int width = 800, height = 800;
+const int width = 100, height = 100;
 
 const float A = 1;
-const float B = 200;
+const float B = 25;
 
 const float C = 1;
-const float D = -200;
+const float D = -25;
 
 const float E = -2;
 const float F = 50;
@@ -43,16 +43,16 @@ struct Point {
 };
 
 struct TrainP :public Point {
-    bool isAbove;
+    Matrix<float> isAbove;
     sf::CircleShape body;
 
     TrainP() : Point() {
         ( coords[1][0] < f1( coords[0][0] ) &&
           coords[1][0] > f2( coords[0][0] ) ) ?
-            isAbove = false :
-            isAbove = true;
+            isAbove = Matrix<float>({{0}}):
+            isAbove = Matrix<float>({{1}});
 
-        if ( !isAbove )
+        if ( !isAbove[0][0] )
             body.setFillColor( sf::Color(0,255,0) );
         // else
         // body.setFillColor( sf::Color(255,0,0) );
@@ -63,11 +63,18 @@ struct TrainP :public Point {
         // body.setFillColor( sf::Color(255,0,0) );
     }
 
-    void color( bool col = true ) {
-        if ( col )
-            body.setFillColor( sf::Color(0,255,0) );
-        else
-            body.setFillColor( sf::Color(255,0,0) );
+    void color( int col = 0 ) {
+        switch ( col ) {
+            case 0:
+                body.setFillColor( sf::Color(0,255,0) );
+                break;
+            case 1:
+                body.setFillColor( sf::Color(255,0,0) );
+                break;
+            case 2:
+                body.setFillColor( sf::Color(255,0,0) );
+                break;
+        }
     }
 
     void draw( sf::RenderWindow& win ) {

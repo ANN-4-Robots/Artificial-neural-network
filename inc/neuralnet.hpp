@@ -78,19 +78,22 @@ class NeuralNet {
         return output;
     }
 
-    void train ( Matrix <float> inputs, Matrix <float> expectedResults ) {
+    void backpropagate( Matrix <float> inputs, Matrix <float> expected ) {
         // Sigmoid derivative function
         auto dSigmoid = []( float& x ){ x = x*(1-x); };
+        //auto lSquares = []( float& x ){ x = pow(x,2)/2; };
 
         // Get valued calculated by current state of NN
-        Matrix <float> results = feedforward ( inputs );
+        Matrix<float> results = feedforward ( inputs );
 
         // Vectors of matrices holding error values of each layer 
         std::vector< Matrix<float> > errors;
         errors.resize( hWages.size() );
         // Calculate the error of NN's output
-        Matrix <float> error = expectedResults - results;
-        errors.back() = error;
+        Matrix<float> finalErr = expected - results;
+        // apply x^2/2 
+        //finalErr.map( lSquares );
+        errors.back() = finalErr;
 
         // Calculate the errors of hidden layers
         for ( int i = errors.size() - 1; i > 0; --i ) {
@@ -100,8 +103,8 @@ class NeuralNet {
         // Back propagate wages towards it's gradient
         // Last wages
         results.map( dSigmoid );
-        Matrix <float> deltaWage = Matrix <float>::elementwise( results, error ) * hValues.back().T() * learnRate;
-        Matrix <float> deltaBias = Matrix <float>::elementwise( results, error ) * learnRate;
+        Matrix <float> deltaWage = Matrix <float>::elementwise( results, finalErr ) * hValues.back().T() * learnRate;
+        Matrix <float> deltaBias = Matrix <float>::elementwise( results, finalErr ) * learnRate;
         hWages.back() = hWages.back() + deltaWage;
         biases.back() = biases.back() + deltaBias;
         // All hidden
