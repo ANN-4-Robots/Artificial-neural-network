@@ -20,6 +20,8 @@ class Matrix {
     void fill( U );
     // randomize content beetwen lower & upper bound
     void randomize( U , U = 0 );
+    // Hadaward product of 2 matrices
+    static Matrix elementwise( Matrix, Matrix );
     // transpose self
     void transpose();
     // return transposed
@@ -88,6 +90,19 @@ void Matrix<U>::randomize( U upper_bound, U lower_bound ) {
         for ( auto& value : row )
             value = float(rand()%1000) / 1000 * (upper_bound - lower_bound) + lower_bound;
 }
+template <class U>
+Matrix<U> Matrix<U>::elementwise( Matrix first, Matrix second ) {
+    if ( first.cols != second.cols && first.rows != second.rows )
+        throw "SIZE_NO_MATCH";
+    Matrix<U> result;
+    for ( int i = 0; i < first.rows; ++i ) {
+        for ( int j = 0; j < first.cols; ++j ) {
+            result[i][j] = first[i][j] * second[i][j];
+        }
+    }
+    return result;
+}
+
 
 template <class U>
 void Matrix<U>::transpose() {

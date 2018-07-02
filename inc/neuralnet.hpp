@@ -7,6 +7,7 @@ class NeuralNet {
     int hLayers;
     int iNum;
     int oNum;
+    const float learnRate = 0.05;
 
     std::vector< Matrix<float> > hValues;
     std::vector< Matrix<float> > hWages;
@@ -60,14 +61,17 @@ class NeuralNet {
     Matrix<float> feedforward( Matrix<float> inputs ) {
         // Sigmoid function
         auto sigmoid = []( float& x ){ x = 1/(1+pow(M_E,-x)); };
+
         // get the value for the first hidden layer
         hValues[0] = hWages[0] * inputs + biases[0];
         hValues[0].map( sigmoid );
+
         // get the value for the rest of hidden
         for ( int i = 1; i < hLayers; ++i ) {
             hValues[i] = hWages[i] * hValues[i-1] + biases[0];
             hValues[i].map( sigmoid );
         }
+
         // get the output value
         auto output = *hWages.rbegin() * *hValues.rbegin() + *biases.rbegin();
         output.map( sigmoid );
@@ -75,29 +79,52 @@ class NeuralNet {
     }
 
     void train ( Matrix <float> inputs, Matrix <float> expectedResults ) {
+        // Sigmoid derivative function
+        auto dSigmoid = []( float& x ){ x = x*(1-x); };
+
         // Vectors of matrices holding error values of each layer 
         std::vector< Matrix<float> > errors;
-        errors.resize( hWages.size() - 1);
+        errors.resize( hWages.size() );
 
         // Get valued calculated by current state of NN
         Matrix <float> results = feedforward ( inputs );
 
         // Calculate the error of NN's output
         Matrix <float> error = expectedResults - results;
-        // std::cout << error.getSize().first << "\t" << error.getSize().second << std::endl;
 
         // Get the error value of last layer
         Matrix <float> outputError = hWages.back().T() * error;
         errors.emplace_back( outputError );
 
         // Calculate the errors of hidden layers
-        for ( int i = errors.size() - 1; i > 0; --i )
+        for ( int i = errors.size() - 1; i > 0; --i ) {
             errors[i - 1] = hWages[i - 1].T() * errors[i];
-
-        for( uint i = 0; i < errors.size(); ++i ) {
-            std::cout <<"Wages Matrix:\n" <<  hWages[i] << "\n";
-            std::cout <<"Errors Vector:\n" << errors[i] << "\n\n";
         }
+        // Back propagate wages towards it's gradient
+        // Last wages
+        results.map( dSigmoid );
+        Matrix <float> deltaWage = Matrix <float>::elementwise( results, error ) * hValues.rbegin()->T() * learnRate;
+        Matrix <float> deltaBias = Matrix <float>::elementwise( results, error ) * learnRate;
+        *hWages.rbegin() = *hWages.rbegin() + deltaWage;
+        *biases.rbegin() = *biases.rbegin() + deltaWage;
+        // All hidden
+        for ( int i = hLayers -1; i > 0; --i ) {
+            hValues[i].map( dSigmoid );
+            deltaWage = Matrix <float>::elementwise( hValues[i], error ) * hValues[i-1].T() * learnRate;
+            deltaBias = Matrix <float>::elementwise( hValues[i], error ) * learnRate;
+            hWages[i] = hWages[i] + deltaWage;
+            biases[i] = biases[i] + deltaWage;
+        }
+        // First wages
+        hValues.begin()->map( dSigmoid );
+        deltaWage = Matrix <float>::elementwise( hValues[0], error ) * inputs.T() * learnRate;
+        deltaBias = Matrix <float>::elementwise( hValues[0], error ) * learnRate;
+        hWages[0] = hWages[0] + deltaWage;
+        biases[0] = biases[0] + deltaWage;
+        // for( uint i = 0; i < errors.size(); ++i ) {
+        //     std::cout <<"Wages Matrix:\n" <<  hWages[i] << "\n";
+        //     std::cout <<"Errors Vector:\n" << errors[i] << "\n\n";
+        // }
     }
 };
 
