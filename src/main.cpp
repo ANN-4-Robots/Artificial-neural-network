@@ -38,6 +38,7 @@ int main() {
         win.clear( sf::Color( 69, 69, 69 ) );
         drawImage( &win, img );
         drawText( &win, 10 , 300, "Current digit: " + to_string( int( lbl[0][0] )));
+        drawOutput( &win, 500, 10, 20, img);
         win.display();
     }
 

@@ -26,3 +26,16 @@ void drawText ( sf::RenderWindow *win, int pos_x, int pos_y, string displayText 
 
     win->draw( text );
 }
+
+void drawOutput ( sf::RenderWindow *win, int pos_x, int pos_y, int size,  Matrix <float> output ) {
+    sf::CircleShape circle;
+    float color;
+    circle.setRadius( size );
+    for (int i = 0; i < output.getSize().first; ++i ) {
+        color = 255 * output[1][i];
+        circle.setFillColor ( sf::Color( color, color, color ) );
+        circle.setPosition ( pos_x, pos_y + i * 3 * size );
+        win->draw( circle );
+        drawText( win, pos_x + size / 2, pos_y + i * 3 * size, to_string( int( output[1][i] ) ) );
+    }
+}
