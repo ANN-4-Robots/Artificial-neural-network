@@ -27,9 +27,10 @@ int main() {
         Matrix <float> lbl = idx.getLabel(n);
 
         //train 5k times
-        int i = 5;
+        int i = 100;
         while (--i) {
             count += train( nn, 1000 );
+            std::cout << i << std::endl;
         }
         sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
         fpsClock clock(15);
@@ -45,7 +46,7 @@ int main() {
                     digit = int( lbl[0][0] );
                     break;
                 case 3:
-                    count += train( nn, 1000 );
+                    count += train( nn, 10000 );
                 default:
                     break;
             }
