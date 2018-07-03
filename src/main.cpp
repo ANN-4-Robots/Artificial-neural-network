@@ -16,8 +16,8 @@ int train( NeuralNet& nn, int amount );
 
 using namespace std;
 int main() {
-    NeuralNet nn( 784, {16, 16}, 10 );
-    nn.setLearnRate( 0.05 );
+    NeuralNet nn( 784, 16, 10 );
+    nn.setLearnRate( 0.01 );
 
     srand( time( NULL ) );
     int count{}, digit{} ,n{};
@@ -79,6 +79,7 @@ int train( NeuralNet& nn, int amount ) {
     while ( --i ) {
         int n = rand()%60000;
         img = idx.getImage(n);
+        // cout << img << endl;
         lbl = idx.getLabel(n);
         digit = int( lbl[0][0] );
         exp_output.fill( 0 );

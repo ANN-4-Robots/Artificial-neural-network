@@ -29,10 +29,11 @@ class Idx {
             for (int j = 0; j < 28; ++j ) { //Rows
             // Move indexer to pixel in i column in j row
             _image.seekg( 784 * n + 16 + 28 * i + j );
-            _image.read( value, sizeof( value ) );   
+            _image.read( value, 1 );   
 
-            float res = int( *value );
 
+            float res = int( static_cast<unsigned char>( value[0] ) );
+            // cout << res << "\n";
             image[i][j] = res;
             }
         }
