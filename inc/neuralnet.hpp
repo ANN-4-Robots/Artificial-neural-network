@@ -8,6 +8,7 @@ class NeuralNet {
     int iNum;
     int oNum;
     float learnRate = 0.1;
+    float error;
 
     std::vector< Matrix<float> > hValues;
     std::vector< Matrix<float> > hWages;
@@ -82,7 +83,7 @@ class NeuralNet {
         // Sigmoid derivative function
         auto dSigmoid = []( float& x ){ x = x*(1-x); };
         // error
-        // auto lSquares = []( float& x ){ x = pow(x,2)/2; };
+        auto lSquares = []( float& x ){ x = pow(x,2)/2; };
 
         // Get valued calculated by current state of NN
         Matrix<float> results = feedforward ( inputs );
@@ -92,13 +93,18 @@ class NeuralNet {
         errors.resize( hWages.size() );
         // Calculate the error of NN's output
         Matrix<float> finalErr = results - expected;
-        // apply x^2/2 
-        // finalErr.map( lSquares );
         // get the derivative of the sum value of outputs
         auto dValue = results;
         dValue.map( dSigmoid ); 
         // push the error maped by dValues to errors
         errors.back() = Matrix<float>::elementwise( finalErr, dValue );
+        // Calculate total error
+        finalErr = expected - results;
+        // apply x^2/2 
+        error = 0;
+        finalErr.map( lSquares );
+        for ( int i = 0; i < finalErr.getSize().first; ++i )
+            error += finalErr[i][0];
 
         // Calculate the errors of hidden layers
         for ( int i = hLayers-1; i >= 0; --i ) {
@@ -128,6 +134,10 @@ class NeuralNet {
             hWages[i] = hWages[i] - gradsW[i] * learnRate;
             biases[i] = biases[i] - gradsB[i] * learnRate;
         }
+    }
+
+    float getError() {
+        return error;
     }
 
     void setLearnRate( float lr ) {
