@@ -23,7 +23,7 @@ class Idx {
 
         Matrix <float> image( 28, 28 );
         char value[1];
-        float res;
+        //float res;
 
         for (int i = 0; i < 28; ++i ) {     //Cols
             for (int j = 0; j < 28; ++j ) { //Rows
@@ -54,7 +54,7 @@ class Idx {
     int convert( char *buffer, int size ) {
         // Convert multiple bytes to one int
         int value{};
-        for( uint i = 0; i < size; ++i ) {
+        for( int i = 0; i < size; ++i ) {
             value += buffer[i] << ( 8 * ( size - i - 1 ));
         }
         return value;

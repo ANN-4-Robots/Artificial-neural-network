@@ -8,6 +8,7 @@ int handleEvents( sf::RenderWindow& win ) {
                 case sf::Keyboard::Escape:      win.close(); return 1;
                 case sf::Keyboard::Space:       return 2;
                 case sf::Keyboard::Return:      return 3;
+                default: break;
             }
         }	
     }

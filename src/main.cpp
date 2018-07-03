@@ -20,18 +20,17 @@ int main() {
     nn.setLearnRate( 0.05 );
 
     srand( time( NULL ) );
-    int count{}, digit{};
-    Idx idx;
-    Matrix <float> img;
-    Matrix <float> lbl;
-
-    //train 5k times
-    int i = 5;
-    while (--i) {
-        count += train( nn, 1000 );
-    }
-    
+    int count{}, digit{} ,n{};
     try {
+        Idx idx;
+        Matrix <float> img = idx.getImage(n);
+        Matrix <float> lbl = idx.getLabel(n);
+
+        //train 5k times
+        int i = 5;
+        while (--i) {
+            count += train( nn, 1000 );
+        }
         sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
         fpsClock clock(15);
         while( win.isOpen() ) {
@@ -40,13 +39,15 @@ int main() {
                 case 0: break;
                 case 1: return 0;
                 case 2:
-                    int n = rand()%60000;
+                    n = rand()%60000;
                     img = idx.getImage(n);
                     lbl = idx.getLabel(n);
                     digit = int( lbl[0][0] );
                     break;
                 case 3:
                     count += train( nn, 1000 );
+                default:
+                    break;
             }
 
             if ( clock.tick() ) {
@@ -60,6 +61,8 @@ int main() {
         }
     } catch (const char* error) {
         std::cout << error << std::endl;
+    } catch (std::string err) {
+        std::cout << err << std::endl;
     }
     return 0;
 }

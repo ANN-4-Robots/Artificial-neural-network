@@ -82,7 +82,7 @@ class NeuralNet {
         // Sigmoid derivative function
         auto dSigmoid = []( float& x ){ x = x*(1-x); };
         // error
-        auto lSquares = []( float& x ){ x = pow(x,2)/2; };
+        // auto lSquares = []( float& x ){ x = pow(x,2)/2; };
 
         // Get valued calculated by current state of NN
         Matrix<float> results = feedforward ( inputs );
