@@ -17,7 +17,7 @@ int getResult( Matrix<float> results );
 
 using namespace std;
 int main() {
-    NeuralNet nn( 784, 16, 10 );
+    NeuralNet nn( 784, {16, 16}, 10 );
     nn.setLearnRate( 0.01 );
 
     srand( time( NULL ) );
@@ -30,7 +30,7 @@ int main() {
         int digit = int( lbl[0][0] );
 
         // Pre-training -------------------------------------------------
-        int i = 1;
+        int i = 200;
         while (--i) {
             count += train( nn, 1000 );
             std::cout << i << std::endl;

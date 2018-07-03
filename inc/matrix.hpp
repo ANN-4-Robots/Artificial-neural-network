@@ -65,7 +65,7 @@ Matrix<U>::Matrix( int rows_, int cols_ ) {
 
 template <class U>
 std::pair<int, int> Matrix<U>::getSize() {
-    return std::pair(rows,cols);
+    return std::pair<int, int> (rows,cols);
 }
 
 template <class U>
