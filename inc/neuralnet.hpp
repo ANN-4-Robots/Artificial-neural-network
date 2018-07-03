@@ -7,7 +7,7 @@ class NeuralNet {
     int hLayers;
     int iNum;
     int oNum;
-    float learnRate;
+    float learnRate = 0.1;
 
     std::vector< Matrix<float> > hValues;
     std::vector< Matrix<float> > hWages;

@@ -10,7 +10,7 @@
 #include "neuralnet.hpp"
 #include "idx.hpp"
 #include "display.hpp"
-#include "fpsClock.hpp"
+// #include "fpsClock.hpp"
 
 using namespace std;
 int main() {
@@ -33,7 +33,7 @@ int main() {
                 if ( event.key.code == sf::Keyboard::Space ) ++count;
             }	
         }
-        
+
         Matrix <float> img = idx.getImage(count);
         Matrix <float> lbl = idx.getLabel(count);
         int digit = int( lbl[0][0] );
@@ -41,13 +41,17 @@ int main() {
 
         exp_output.fill( 0 );
         exp_output[0][digit] = 1;
-        nn.train( reshapeMatrix( img ).T(), exp_output.T() );
-    
+        if(count <= 1000) {
+            ++count;
+            nn.train( reshapeMatrix( img ).T(), exp_output.T() );
+        }
 
         win.clear( sf::Color( 69, 69, 69 ) );
         drawImage( &win, img );
         drawText( &win, 10 , 300, "Current digit: " + to_string( digit ) );
+        drawText( &win, 10, 350, "Count: " + to_string( count ) );
         drawOutput( &win, 500, 10, 20, nn.feedforward( reshapeMatrix( img ).T() ).T() );
+       
         win.display();
     }
 
