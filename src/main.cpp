@@ -26,12 +26,13 @@ int main() {
         Matrix <float> img = idx.getImage(n);
         Matrix <float> lbl = idx.getLabel(n);
 
-        //train 5k times
+        // Pre-training -------------------------------------------------
         int i = 100;
         while (--i) {
             count += train( nn, 1000 );
             std::cout << i << std::endl;
         }
+        // --------------------------------------------------------------
         sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
         fpsClock clock(15);
         while( win.isOpen() ) {
@@ -40,13 +41,15 @@ int main() {
                 case 0: break;
                 case 1: return 0;
                 case 2:
+                    // Hit space for new prediction
                     n = rand()%60000;
                     img = idx.getImage(n);
                     lbl = idx.getLabel(n);
                     digit = int( lbl[0][0] );
                     break;
                 case 3:
-                    count += train( nn, 10000 );
+                    // Hit Enter for extra training
+                    count += train( nn, 1000 );
                 default:
                     break;
             }
