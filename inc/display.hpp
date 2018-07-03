@@ -34,7 +34,15 @@ void drawOutput ( sf::RenderWindow *win, int pos_x, int pos_y, int size,  Matrix
         circle.setFillColor ( sf::Color( 255 * output[0][i], 255 * output[0][i], 255 * output[0][i] ) );
         circle.setPosition ( pos_x, pos_y + i * 3 * size );
         win->draw( circle );
-        drawText( win, pos_x + 3 * size, pos_y + i * 3 * size, to_string( int( output[0][i] ) ) );
+        drawText( win, pos_x + 3 * size, pos_y + i * 3 * size, to_string( output[0][i] ) );
         drawText( win, pos_x - 3 * size, pos_y + i * 3 * size, to_string( i ) + " -" );
     }
+}
+
+Matrix <float> reshapeMatrix ( Matrix <float> input ) {
+    Matrix <float> result(1, input.getSize().first * input.getSize().second );
+    for ( int i = 0; i < result.getSize().second; ++i ) {
+        result[0][i] = input[i % input.getSize().first][i / input.getSize().first];
+    }
+    return result;
 }

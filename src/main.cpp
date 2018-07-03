@@ -33,6 +33,7 @@ int main() {
                 if ( event.key.code == sf::Keyboard::Space ) ++count;
             }	
         }
+        
         Matrix <float> img = idx.getImage(count);
         Matrix <float> lbl = idx.getLabel(count);
         int digit = int( lbl[0][0] );
@@ -40,12 +41,13 @@ int main() {
 
         exp_output.fill( 0 );
         exp_output[0][digit] = 1;
-        // nn.train( img, exp_output );
+        nn.train( reshapeMatrix( img ).T(), exp_output.T() );
+    
 
         win.clear( sf::Color( 69, 69, 69 ) );
         drawImage( &win, img );
         drawText( &win, 10 , 300, "Current digit: " + to_string( digit ) );
-        drawOutput( &win, 500, 10, 20, exp_output );
+        drawOutput( &win, 500, 10, 20, nn.feedforward( reshapeMatrix( img ).T() ).T() );
         win.display();
     }
 
