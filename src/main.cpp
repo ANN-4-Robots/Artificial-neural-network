@@ -13,6 +13,7 @@
 #include "fpsClock.hpp"
 
 int train( NeuralNet& nn, int amount );
+int getResult( Matrix<float> results );
 
 using namespace std;
 int main() {
@@ -20,18 +21,25 @@ int main() {
     nn.setLearnRate( 0.05 );
 
     srand( time( NULL ) );
-    int count{}, digit{} ,n{};
+    int count{}, n{}, good{}, total{};
     try {
         Idx idx;
+        Matrix <float> results;
         Matrix <float> img = idx.getImage(n);
         Matrix <float> lbl = idx.getLabel(n);
+        int digit = int( lbl[0][0] );
 
         // Pre-training -------------------------------------------------
-        int i = 100;
+        int i = 1;
         while (--i) {
             count += train( nn, 1000 );
             std::cout << i << std::endl;
         }
+        // get first prediction
+        results = nn.feedforward( reshapeMatrix( img ).T() );
+        total ++;
+        if ( digit == getResult( results ) )
+            good ++;
         // --------------------------------------------------------------
         sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
         fpsClock clock(15);
@@ -46,6 +54,10 @@ int main() {
                     img = idx.getImage(n);
                     lbl = idx.getLabel(n);
                     digit = int( lbl[0][0] );
+                    results = nn.feedforward( reshapeMatrix( img ).T() );
+                    total ++;
+                    if ( digit == getResult( results ) )
+                        good ++;
                     break;
                 case 3:
                     // Hit Enter for extra training
@@ -55,11 +67,16 @@ int main() {
             }
 
             if ( clock.tick() ) {
+                auto ratio = float(good)/total*100.f;
                 win.clear( sf::Color( 51, 51, 51 ) );
                 drawImage( win, img );
                 drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
                 drawText( win, 10, 350, "Count: " + to_string( count ) );
-                drawOutput( win, 500, 10, 20, nn.feedforward( reshapeMatrix( img ).T() ).T() );
+                drawText( win, 10, 400, "Error: " + to_string( nn.getError() ) );
+                drawText( win, 10, 450, "Good: " + to_string( good ) );
+                drawText( win, 10, 500, "Total: " + to_string( total ) );
+                drawText( win, 10, 550, "Ratio: " + to_string( ratio ) + "%" );
+                drawOutput( win, 500, 10, 20, results.T() );
                 win.display();
             }
         }
@@ -69,6 +86,18 @@ int main() {
         std::cout << err << std::endl;
     }
     return 0;
+}
+
+int getResult( Matrix<float> results ) {
+    float highest{};
+    int index;
+    for ( int i = 0; i < results.getSize().first ; ++i ) {
+        if ( results[i][0] > highest ) {
+            highest = results[i][0];
+            index = i;
+        }
+    }
+    return index;
 }
 
 int train( NeuralNet& nn, int amount ) {
