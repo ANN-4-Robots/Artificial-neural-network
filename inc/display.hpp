@@ -29,13 +29,12 @@ void drawText ( sf::RenderWindow *win, int pos_x, int pos_y, string displayText 
 
 void drawOutput ( sf::RenderWindow *win, int pos_x, int pos_y, int size,  Matrix <float> output ) {
     sf::CircleShape circle;
-    float color;
     circle.setRadius( size );
-    for (int i = 0; i < output.getSize().first; ++i ) {
-        color = 255 * output[1][i];
-        circle.setFillColor ( sf::Color( color, color, color ) );
+    for (int i = 0; i < output.getSize().second; ++i ) {
+        circle.setFillColor ( sf::Color( 255 * output[0][i], 255 * output[0][i], 255 * output[0][i] ) );
         circle.setPosition ( pos_x, pos_y + i * 3 * size );
         win->draw( circle );
-        drawText( win, pos_x + size / 2, pos_y + i * 3 * size, to_string( int( output[1][i] ) ) );
+        drawText( win, pos_x + 3 * size, pos_y + i * 3 * size, to_string( int( output[0][i] ) ) );
+        drawText( win, pos_x - 3 * size, pos_y + i * 3 * size, to_string( i ) + " -" );
     }
 }

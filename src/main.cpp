@@ -20,6 +20,7 @@ int main() {
     Idx idx;
     int count{};
     
+    NeuralNet nn( 784, {12, 12}, 10 );
 
     while( win.isOpen() ) {
 
@@ -34,11 +35,17 @@ int main() {
         }
         Matrix <float> img = idx.getImage(count);
         Matrix <float> lbl = idx.getLabel(count);
+        int digit = int( lbl[0][0] );
+        Matrix <float> exp_output(1, 10);
+
+        exp_output.fill( 0 );
+        exp_output[0][digit] = 1;
+        // nn.train( img, exp_output );
 
         win.clear( sf::Color( 69, 69, 69 ) );
         drawImage( &win, img );
-        drawText( &win, 10 , 300, "Current digit: " + to_string( int( lbl[0][0] )));
-        drawOutput( &win, 500, 10, 20, img);
+        drawText( &win, 10 , 300, "Current digit: " + to_string( digit ) );
+        drawOutput( &win, 500, 10, 20, exp_output );
         win.display();
     }
 
