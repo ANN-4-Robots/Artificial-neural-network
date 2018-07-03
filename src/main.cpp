@@ -10,13 +10,15 @@
 
 
 int main() {
+    try {
+
     srand( time( NULL ) );
     fpsClock clock(1);
     sf::RenderWindow win ( sf::VideoMode( width, height ), "Neural Net");
 
-    NeuralNet nn( 2, 5, 1 );
+    NeuralNet nn( 2, {10,5,10}, 2 );
 
-// XOR ----------------------------------------------------------------------
+// XOR -------------------------------------------------------------------------
     // std::vector<Matrix<float>> trainSet;
     // std::vector<Matrix<float>> ideal;
     // for ( auto i : { 0, 1 } ) {
@@ -29,8 +31,8 @@ int main() {
     //     }
     // }
 
-    // nn.setLearnRate(0.2);
-    // long long i = 500000;
+    // nn.setLearnRate(0.01);
+    // long long i = 1000000;
     // while (--i) {
     //     int random = rand()%4;
     //     nn.backpropagate( trainSet[random], ideal[random] );
@@ -39,17 +41,27 @@ int main() {
     //     std::cout << nn.feedforward( trainSet[i] );
 //------------------------------------------------------------------------------
 
-    try {
+// GRAPHICAL TEST --------------------------------------------------------------
+// SET UP GRAPHICAL AREA IN POINT LINE 50
         std::vector< TrainP > drawSet;
         for ( int i = 0; i < 2000; ++i )
             drawSet.emplace_back();
-        // for ( int j = 0; j < 50; ++j ) {
-        //     for ( int i = 0; i < 10000; ++i ) {
-        //         TrainP trainP;
-        //         nn.backpropagate( trainP.coords, trainP.isAbove );
-        //     }
-        //     std::cout << j << std::endl;
-        // }
+
+        // Draw the expected -------------------------------------
+        win.clear( sf::Color(51, 51, 51) );
+        for ( auto& point : drawSet )
+            point.draw(win);
+        win.display();
+        // -------------------------------------------------------
+        // Pretraining -------------------------------------------
+        for ( int j = 0; j < 50; ++j ) {
+            for ( int i = 0; i < 10000; ++i ) {
+                TrainP trainP;
+                nn.backpropagate( trainP.coords, trainP.isAbove );
+            }
+            std::cout << j << std::endl;
+        }
+        // -------------------------------------------------------
         while ( win.isOpen() ) {
             if ( clock.tick() ) {
                 sf::Event event;
@@ -58,16 +70,17 @@ int main() {
                         win.close();
                 }
 
-                // Training untill
+                // Training step -------------------------------------
                 for ( int i = 0; i < 10; ++i ) {
                     TrainP trainP;
                     nn.backpropagate( trainP.coords, trainP.isAbove );
                 }
-
+                // ---------------------------------------------------
                 for ( auto& point : drawSet ) {
-                    if ( nn.feedforward( point.coords )[0][0] <= 0.25 )
+                    auto res = nn.feedforward( point.coords );
+                    if ( res[0][0] && res[1][0] )
                         point.color();
-                    else if ( nn.feedforward( point.coords )[0][0] <= 0.75 )
+                    else if ( res[0][0] && !res[1][0] )
                         point.color( 2 );
                     else
                         point.color(1);
@@ -80,6 +93,7 @@ int main() {
             }
         }
         return 0;
+//------------------------------------------------------------------------------
     } catch ( const char* message ) {
         std::cout << message << std::endl;
     }

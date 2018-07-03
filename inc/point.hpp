@@ -1,13 +1,13 @@
 #ifndef POINT_HPP_
 #define POINT_HPP_
 
-const int width = 100, height = 100;
+const int width = 300, height = 300;
 
 const float A = 1;
-const float B = 25;
+const float B = 50;
 
 const float C = 1;
-const float D = -25;
+const float D = -50;
 
 const float E = -2;
 const float F = 50;
@@ -47,20 +47,21 @@ struct TrainP :public Point {
     sf::CircleShape body;
 
     TrainP() : Point() {
-        ( coords[1][0] < f1( coords[0][0] ) &&
-          coords[1][0] > f2( coords[0][0] ) ) ?
-            isAbove = Matrix<float>({{0}}):
-            isAbove = Matrix<float>({{1}});
+        // SET UP THE EXPECTED AREA
+        if ( coords[1][0] < f1( coords[0][0] ) && coords[1][0] > f2( coords[0][0] ) )
+            isAbove = Matrix<float>({{1},{1}});
+        else if ( coords[1][0] > f1( coords[0][0] ) && coords[1][0] > f2( coords[0][0] ) )
+            isAbove = Matrix<float>({{1},{0}});
+        else if ( coords[1][0] < f1( coords[0][0] ) && coords[1][0] < f2( coords[0][0] ) )
+            isAbove = Matrix<float>({{0},{1}});
+        else
+            isAbove = Matrix<float>({{0},{0}});
 
-        if ( !isAbove[0][0] )
+        if ( isAbove[0][0] && isAbove[1][0] )
             body.setFillColor( sf::Color(0,255,0) );
-        // else
-        // body.setFillColor( sf::Color(255,0,0) );
-        // std::cout << "X: " << coords[0] << "\t Y: " << coords[1] << "\t ABOVE: " << isAbove << "\n";
 
         body.setRadius( 2 );
         body.setPosition( coords[0][0]+width/2, height/2-coords[1][0] );
-        // body.setFillColor( sf::Color(255,0,0) );
     }
 
     void color( int col = 0 ) {
@@ -72,7 +73,7 @@ struct TrainP :public Point {
                 body.setFillColor( sf::Color(255,0,0) );
                 break;
             case 2:
-                body.setFillColor( sf::Color(255,0,0) );
+                body.setFillColor( sf::Color(100,100,0) );
                 break;
         }
     }
