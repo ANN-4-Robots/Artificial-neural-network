@@ -10,48 +10,78 @@
 #include "neuralnet.hpp"
 #include "idx.hpp"
 #include "display.hpp"
-// #include "fpsClock.hpp"
+#include "fpsClock.hpp"
+
+int train( NeuralNet& nn, int amount );
 
 using namespace std;
 int main() {
-    sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
+    NeuralNet nn( 784, {16, 16}, 10 );
+    nn.setLearnRate( 0.05 );
 
     srand( time( NULL ) );
+    int count{}, digit{};
     Idx idx;
-    int count{};
-    
-    NeuralNet nn( 784, {12, 12}, 10 );
+    Matrix <float> img;
+    Matrix <float> lbl;
 
+    //train 5k times
+    int i = 5;
+    while (--i) {
+        count += train( nn, 1000 );
+    }
+    
     try {
+        sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
+        fpsClock clock(15);
         while( win.isOpen() ) {
             // Process window events
-            if ( handleEvents( win, count ) )   
-                break;
-
-            Matrix <float> img = idx.getImage(count);
-            Matrix <float> lbl = idx.getLabel(count);
-            int digit = int( lbl[0][0] );
-            Matrix <float> exp_output(1, 10);
-
-            exp_output.fill( 0 );
-            exp_output[0][digit] = 1;
-            if(count <= 1000) {
-                ++count;
-                nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
+            switch ( handleEvents( win ) ) {
+                case 0: break;
+                case 1: return 0;
+                case 2:
+                    int n = rand()%60000;
+                    img = idx.getImage(n);
+                    lbl = idx.getLabel(n);
+                    digit = int( lbl[0][0] );
+                    break;
+                case 3:
+                    count += train( nn, 1000 );
             }
 
-            win.clear( sf::Color( 51, 51, 51 ) );
-            drawImage( win, img );
-            drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
-            drawText( win, 10, 350, "Count: " + to_string( count ) );
-            drawOutput( win, 500, 10, 20, nn.feedforward( reshapeMatrix( img ).T() ).T() );
-        
-            win.display();
+            if ( clock.tick() ) {
+                win.clear( sf::Color( 51, 51, 51 ) );
+                drawImage( win, img );
+                drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
+                drawText( win, 10, 350, "Count: " + to_string( count ) );
+                drawOutput( win, 500, 10, 20, nn.feedforward( reshapeMatrix( img ).T() ).T() );
+                win.display();
+            }
         }
     } catch (const char* error) {
         std::cout << error << std::endl;
     }
     return 0;
+}
+
+int train( NeuralNet& nn, int amount ) {
+    Idx idx;
+    int digit;
+    Matrix <float> img;
+    Matrix <float> lbl;
+    Matrix <float> exp_output(1, 10);
+    // Pre training loop
+    long i = amount;
+    while ( --i ) {
+        int n = rand()%60000;
+        img = idx.getImage(n);
+        lbl = idx.getLabel(n);
+        digit = int( lbl[0][0] );
+        exp_output.fill( 0 );
+        exp_output[0][digit] = 1;
+        nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
+    }
+    return amount;
 }
 
 // XOR -------------------------------------------------------------------------

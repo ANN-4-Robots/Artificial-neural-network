@@ -1,15 +1,17 @@
 
-bool handleEvents( sf::RenderWindow& win, int& count ) {
+int handleEvents( sf::RenderWindow& win ) {
     sf::Event event;
     while ( win.pollEvent( event ) ) {	
-        if ( event.type == sf::Event::Closed ) win.close();	
+        if ( event.type == sf::Event::Closed ) { win.close(); return 1; }
         else if ( event.type == sf::Event::KeyPressed ) {
             switch (event.key.code) {
-                case sf::Keyboard::Escape:      win.close(); return true;
-                case sf::Keyboard::Space:       ++count; break;
+                case sf::Keyboard::Escape:      win.close(); return 1;
+                case sf::Keyboard::Space:       return 2;
+                case sf::Keyboard::Return:      return 3;
             }
         }	
     }
+    return 0;
 }
 
 void drawImage ( sf::RenderWindow &win, Matrix <float> img ) {
