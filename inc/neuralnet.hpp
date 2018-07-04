@@ -105,6 +105,7 @@ class NeuralNet {
         // apply x^2/2 
         error = 0;
         finalErr.map( lSquares );
+        // get the sum
         for ( int i = 0; i < finalErr.getSize().first; ++i )
             error += finalErr[i][0];
 
