@@ -15,7 +15,9 @@ class NeuralNet {
     std::vector< Matrix<float> > biases;
 
     public:
-    NeuralNet( int inputsNum, int hiddenNum, int outputsNum ) :learnRate{0.5} {
+    NeuralNet() :learnRate{0.5}, error{0} {}
+
+    NeuralNet( int inputsNum, int hiddenNum, int outputsNum ) :learnRate{0.5}, error{0} {
         iNum = inputsNum;
         hLayers = 1;
         oNum = outputsNum;
@@ -31,7 +33,7 @@ class NeuralNet {
             matrix.randomize( 1, -1 );
     }
 
-    NeuralNet ( int inputsNum, std::initializer_list<int> hNums, int outputsNum ) :learnRate{0.5} {
+    NeuralNet ( int inputsNum, std::initializer_list<int> hNums, int outputsNum ) :learnRate{0.5}, error{0} {
         iNum = inputsNum;
         hLayers = hNums.size();
         oNum = outputsNum;
@@ -134,6 +136,78 @@ class NeuralNet {
             hWages[i] = hWages[i] - gradsW[i] * learnRate;
             biases[i] = biases[i] - gradsB[i] * learnRate;
         }
+    }
+
+    void saveToFile( std::string fileName ) {
+        std::ofstream fout;
+        fout.open( fileName.c_str() );
+        // First number must be number of hidden layers, second learnRate
+        fout << hLayers << " " << learnRate << std::endl;
+        fout << iNum << " ";
+        for ( auto& h : hValues )
+            fout << h.getSize().first << " ";
+        fout << oNum << std::endl;
+        for ( auto& wage : hWages )
+            fout << wage << std::endl;
+        for ( auto& bias : biases )
+            fout << bias << std::endl;
+        fout.close();
+    }
+
+    void loadFromFile( std::string fileName ) {
+        hValues.clear();
+        hWages.clear();
+        biases.clear();
+        std::ifstream fin;
+        fin.open( fileName.c_str() );
+        fin >> hLayers >> learnRate >> iNum;
+        // emplace hidden layers
+        for ( int i = 0, hVal; i < hLayers; ++i ) {
+            fin >> hVal;
+            hValues.emplace_back( hVal, 1 );
+        }
+        fin >> oNum;
+        int n = hValues.front().getSize().first;
+        hWages.emplace_back( n, iNum );
+        // Load Wages for first layer
+        for ( int i = 0; i < n; ++i )
+            for ( int j = 0; j < iNum; ++j )
+                fin >> hWages.front()[i][j];
+        // Load wages for hidden
+        for ( int k = 1; k < hLayers; ++k ) {
+            n = hValues[k].getSize().first;
+            int m = hValues[k-1].getSize().first;
+            hWages.emplace_back( n, m );
+            for ( int i = 0; i < n; ++i )
+                for ( int j = 0; j < m; ++j )
+                    fin >> hWages[k][i][j];
+        }
+        // Load wages for last layer
+        n = hValues.back().getSize().first;
+        hWages.emplace_back( oNum, n );
+        for ( int i = 0; i < oNum; ++i )
+            for ( int j = 0; j < n; ++j )
+                fin >> hWages.back()[i][j];
+        // Load biases for hidden
+        for ( int k = 0; k < hLayers; ++k ) {
+            n = hValues[k].getSize().first;
+            biases.emplace_back( n, 1 );
+            for ( int i = 0; i < n; ++i )
+                fin >> biases[k][i][0];
+        }
+        //and the last bias
+        biases.emplace_back( oNum, 1 );
+        for ( int i = 0; i < oNum; ++i )
+            fin >> biases.back()[i][0];
+        fin.close();
+    }
+
+    std::vector<Matrix<float>> getWages() {
+        return hWages;
+    }
+
+    std::vector<Matrix<float>> getBiases() {
+        return biases;
     }
 
     float getError() {

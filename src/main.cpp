@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include <thread>
 #include <string>
 #include <cstdlib>
 #include <cmath>
@@ -11,16 +12,18 @@
 #include "idx.hpp"
 #include "display.hpp"
 #include "fpsClock.hpp"
+//#include "epoch.hpp"
 
 int train( NeuralNet& nn, int amount );
 int getResult( Matrix<float> results );
 
 using namespace std;
 int main() {
-    NeuralNet nn( 784, {16, 16}, 10 );
-    nn.setLearnRate( 0.01 );
-
     srand( time( NULL ) );
+    NeuralNet nn;
+    nn.loadFromFile( "16_16_01_net.txt" );
+
+// Trening i wyświetlanie
     int count{}, n{}, good{}, total{};
     try {
         Idx idx;
@@ -30,12 +33,12 @@ int main() {
         int digit = int( lbl[0][0] );
 
         // Pre-training -------------------------------------------------
-        int i = 200;
-        while (--i) {
-            count += train( nn, 1000 );
-            std::cout << i << std::endl;
-        }
-        // get first prediction
+        // int i = 5000;
+        // while (i--) {
+        //     train( nn, 1000 );
+        //     std::cout << i << std::endl;
+        // }
+        // get first prediction-------------------
         results = nn.feedforward( reshapeMatrix( img ).T() );
         total ++;
         if ( digit == getResult( results ) )
@@ -88,38 +91,39 @@ int main() {
     return 0;
 }
 
-int getResult( Matrix<float> results ) {
-    float highest{};
-    int index;
-    for ( int i = 0; i < results.getSize().first ; ++i ) {
-        if ( results[i][0] > highest ) {
-            highest = results[i][0];
-            index = i;
+// Functions
+    int getResult( Matrix<float> results ) {
+        float highest{};
+        int index;
+        for ( int i = 0; i < results.getSize().first ; ++i ) {
+            if ( results[i][0] > highest ) {
+                highest = results[i][0];
+                index = i;
+            }
         }
+        return index;
     }
-    return index;
-}
 
-int train( NeuralNet& nn, int amount ) {
-    Idx idx;
-    int digit;
-    Matrix <float> img;
-    Matrix <float> lbl;
-    Matrix <float> exp_output(1, 10);
-    // Pre training loop
-    long i = amount;
-    while ( --i ) {
-        int n = rand()%60000;
-        img = idx.getImage(n);
-        // cout << img << endl;
-        lbl = idx.getLabel(n);
-        digit = int( lbl[0][0] );
-        exp_output.fill( 0 );
-        exp_output[0][digit] = 1;
-        nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
+    int train( NeuralNet& nn, int amount ) {
+        Idx idx;
+        int digit;
+        Matrix <float> img;
+        Matrix <float> lbl;
+        Matrix <float> exp_output(1, 10);
+        // Pre training loop
+        long i = amount;
+        while ( --i ) {
+            int n = rand()%60000;
+            img = idx.getImage(n);
+            // cout << img << endl;
+            lbl = idx.getLabel(n);
+            digit = int( lbl[0][0] );
+            exp_output.fill( 0 );
+            exp_output[0][digit] = 1;
+            nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
+        }
+        return amount;
     }
-    return amount;
-}
 
 // XOR -------------------------------------------------------------------------
     // std::vector<Matrix<float>> trainSet;
