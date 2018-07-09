@@ -28,7 +28,7 @@ class Epoch {
         exp_output.reshape( 1, 10 );
     }
 
-    void train( NeuralNet& nn, sf::RenderWindow &win ) {
+    int train( NeuralNet& nn, sf::RenderWindow &win ) {
 
         long it = iterationSize;
         while ( --it ) {
@@ -74,12 +74,16 @@ class Epoch {
             error.push_back( rightGuessCount / checkBatchSize );
             cout << rightGuessCount / checkBatchSize << endl;
 
-            updateWindow( win, res );
+            updateWindow( win, res, img, totalCount, goodCount, error.back(), digit );
+            drawText( win, 10, 600, "Press ENTER to stop learning" );
+
             // Rerender window
-            if( handleEvents( win ) == 1 ) break;
-
+            auto retEve = handleEvents( win );
+            if( retEve == 1 ) break;
+            else if( retEve == 3 ) return 1;
+            win.display();
         }
-
+        return 0;
     }
 
     void getData ( int n ) {
@@ -92,16 +96,7 @@ class Epoch {
         exp_output[0][digit] = 1;
     }
     
-    void updateWindow ( sf::RenderWindow& win, Matrix <float> results ) {
-        win.clear( sf::Color( 51, 51, 51 ) );
-        drawImage( win, img );
-        drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
-        drawText( win, 10, 400, "Error: " + to_string( error.back() ) );
-        drawText( win, 10, 450, "Good: " + to_string( goodCount ) );
-        drawText( win, 10, 500, "Total: " + to_string( totalCount ) );
-        drawText( win, 10, 550, "Ratio: " + to_string( 100 * float( goodCount ) / totalCount ) + "%" );
-        drawOutput( win, 500, 10, 20, results.T() );
-    }
+
     /*
     Epoch() {
         std::thread t1( log( {16, 16, 16}, 0.02 ) );

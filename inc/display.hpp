@@ -13,7 +13,6 @@ int handleEvents( sf::RenderWindow& win ) {
             }
         }	
     }
-    win.display();
     return 0;
 }
 
@@ -63,6 +62,17 @@ Matrix <float> reshapeMatrix ( Matrix <float> input ) {
     return result;
 }
 
+
+void updateWindow ( sf::RenderWindow& win, Matrix <float> results, Matrix <float> img,
+                                            int total, int good, float error, int digit ) {
+    win.clear( sf::Color( 51, 51, 51 ) );
+    drawImage( win, img );
+    drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
+    drawText( win, 10, 400, "Error: " + to_string( error ) );
+    drawText( win, 10, 450, "Good: " + to_string( good ) );
+    drawText( win, 10, 500, "Total: " + to_string( total ) );
+    drawOutput( win, 500, 10, 20, results.T() );
+}
 // void drawWindow (int good, int total, sf::RenderWindow &win, ) {
 //     auto ratio = float(good)/total*100.f;
 //     win.clear( sf::Color( 51, 51, 51 ) );

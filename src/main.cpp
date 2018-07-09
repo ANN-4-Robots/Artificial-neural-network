@@ -35,10 +35,40 @@ int main() {
     epoch.train( nn, win );
     
     // Flag used to toggle rendering window each time
-    bool _display = 0;
+    // bool _display = true;
+
+    win.clear( sf::Color( 51, 51, 51 ) );
+    drawText( win, 10, 600, "Press ENTER to load pre-learned Network" );
+    drawText( win, 10, 650, "Press SPACE to get new image" );
+    win.display();
 
     while( win.isOpen() ) {
-        if( _display ) handleEvents( win );
+        auto res = handleEvents( win );
+
+        Idx idx;
+        int n = rand() % 60000;
+        Matrix <float> results;
+        Matrix <float> img = idx.getImage(n);
+        Matrix <float> lbl = idx.getLabel(n);
+        int digit = int( lbl[0][0] );
+
+
+        win.clear( sf::Color( 51, 51, 51 ) );
+
+
+        drawText( win, 10, 600, "Press ENTER to load pre-learned Network" );
+        drawText( win, 10, 650, "Press SPACE to get new image" );
+        if( res == 3 ) {
+            nn.loadFromFile( "16_16_01_net.txt" );
+            win.display();
+        }
+        if( res == 2 ) {
+            drawImage( win, img );
+            drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
+            results = nn.feedforward( reshapeMatrix( img ).T() );
+            drawOutput( win, 500, 10, 20, results.T() );
+            win.display();
+        }
     }
 /*
     nn.loadFromFile( "16_16_01_net.txt" );
