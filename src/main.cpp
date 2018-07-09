@@ -1,28 +1,47 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include <functional>
 #include <thread>
 #include <string>
 #include <cstdlib>
 #include <cmath>
 #include <fstream>
+#include "fpsClock.hpp"
 #include "matrix.hpp"
 #include "point.hpp"
 #include "neuralnet.hpp"
 #include "idx.hpp"
 #include "display.hpp"
-#include "fpsClock.hpp"
-//#include "epoch.hpp"
+#include "epoch.hpp"
+
+using namespace std;
+
 
 int train( NeuralNet& nn, int amount );
 int getResult( Matrix<float> results );
 
-using namespace std;
-int main() {
-    srand( time( NULL ) );
-    NeuralNet nn;
-    nn.loadFromFile( "16_16_01_net.txt" );
 
+
+
+
+int main() {
+
+    srand( time( NULL ) );
+    NeuralNet nn( 784, {16, 16}, 10 );
+    Epoch epoch( 20000, 1000, 100 );
+    sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
+
+    epoch.train( nn, win );
+    
+    // Flag used to toggle rendering window each time
+    bool _display = 0;
+
+    while( win.isOpen() ) {
+        if( _display ) handleEvents( win );
+    }
+/*
+    nn.loadFromFile( "16_16_01_net.txt" );
 // Trening i wyświetlanie
     int count{}, n{}, good{}, total{};
     try {
@@ -44,7 +63,7 @@ int main() {
         if ( digit == getResult( results ) )
             good ++;
         // --------------------------------------------------------------
-        sf::RenderWindow win ( sf::VideoMode( 800, 800 ), "Neural Net");
+        
         fpsClock clock(15);
         while( win.isOpen() ) {
             // Process window events
@@ -88,6 +107,7 @@ int main() {
     } catch (std::string err) {
         std::cout << err << std::endl;
     }
+*/
     return 0;
 }
 
@@ -104,26 +124,26 @@ int main() {
         return index;
     }
 
-    int train( NeuralNet& nn, int amount ) {
-        Idx idx;
-        int digit;
-        Matrix <float> img;
-        Matrix <float> lbl;
-        Matrix <float> exp_output(1, 10);
-        // Pre training loop
-        long i = amount;
-        while ( --i ) {
-            int n = rand()%60000;
-            img = idx.getImage(n);
-            // cout << img << endl;
-            lbl = idx.getLabel(n);
-            digit = int( lbl[0][0] );
-            exp_output.fill( 0 );
-            exp_output[0][digit] = 1;
-            nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
-        }
-        return amount;
-    }
+    // int train( NeuralNet& nn, int amount ) {
+    //     Idx idx;
+    //     int digit;
+    //     Matrix <float> img;
+    //     Matrix <float> lbl;
+    //     Matrix <float> exp_output(1, 10);
+    //     // Pre training loop
+    //     long i = amount;
+    //     while ( --i ) {
+    //         int n = rand()%60000;
+    //         img = idx.getImage(n);
+    //         // cout << img << endl;
+    //         lbl = idx.getLabel(n);
+    //         digit = int( lbl[0][0] );
+    //         exp_output.fill( 0 );
+    //         exp_output[0][digit] = 1;
+    //         nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
+    //     }
+    //     return amount;
+    // }
 
 // XOR -------------------------------------------------------------------------
     // std::vector<Matrix<float>> trainSet;

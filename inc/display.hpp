@@ -1,4 +1,5 @@
-
+#ifndef DISPLAY_HPP_
+#define DISPLAY_HPP_
 int handleEvents( sf::RenderWindow& win ) {
     sf::Event event;
     while ( win.pollEvent( event ) ) {	
@@ -12,6 +13,7 @@ int handleEvents( sf::RenderWindow& win ) {
             }
         }	
     }
+    win.display();
     return 0;
 }
 
@@ -60,3 +62,18 @@ Matrix <float> reshapeMatrix ( Matrix <float> input ) {
     }
     return result;
 }
+
+// void drawWindow (int good, int total, sf::RenderWindow &win, ) {
+//     auto ratio = float(good)/total*100.f;
+//     win.clear( sf::Color( 51, 51, 51 ) );
+//     drawImage( win, img );
+//     drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
+//     drawText( win, 10, 350, "Count: " + to_string( count ) );
+//     drawText( win, 10, 400, "Error: " + to_string( nn.getError() ) );
+//     drawText( win, 10, 450, "Good: " + to_string( good ) );
+//     drawText( win, 10, 500, "Total: " + to_string( total ) );
+//     drawText( win, 10, 550, "Ratio: " + to_string( ratio ) + "%" );
+//     drawOutput( win, 500, 10, 20, results.T() );
+//     win.display();
+// }
+#endif

@@ -1,19 +1,108 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <cstdlib>
-#include <thread>
-#include <cmath>
-#include <fstream>
-#include "matrix.hpp"
-#include "point.hpp"
-#include "neuralnet.hpp"
-#include "idx.hpp"
-#include "display.hpp"
+#ifndef EPOCH_HPP_
+#define EPOCH_HPP_
+
+// #include  "matrix.hpp"
 
 class Epoch {
+
+    int trainBatchSize;
+    int checkBatchSize;
+    int iterationSize;
+    std::vector <float> error;
+    int totalCount{};
+    int goodCount{};
+
+    // Variables containing digit and its corresponding image 
+    Idx idx;
+    int digit;
+    Matrix <float> img;
+    Matrix <float> lbl;
+    Matrix <float> exp_output;
+
     public:
+
+    Epoch( int itSize = 10, int trBaSize = 1000, int chBaSize = 100 ) {
+        trainBatchSize = trBaSize;
+        checkBatchSize = chBaSize;
+        iterationSize = itSize;
+        exp_output.reshape( 1, 10 );
+    }
+
+    void train( NeuralNet& nn, sf::RenderWindow &win ) {
+
+        long it = iterationSize;
+        while ( --it ) {
+            int ba = trainBatchSize;
+            while ( ba-- ) {
+                // Choose random image from 0-60000
+                int n = rand() % 60000;
+                getData( n );
+
+                // Learn the neural network 
+                nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
+            }
+
+            // After training NN 'trainBatchSize' times it's time
+            // To check the progress
+            float rightGuessCount{};
+            int ch = checkBatchSize;
+            Matrix <float> res;
+            while ( --ch ) {
+                // Choose random image from 0-60000
+                int n = rand() % 60000;
+                getData( n );
+
+                // Get guessed result
+                res = nn.feedforward( reshapeMatrix( img ).T() );
+                // cout << digit << "\n";
+                // cout << res << "\n\n";
+                // Find the biggest value
+                int mostProb;
+                float biggestValue{};
+                for( int i = 0; i < res.getSize().first; ++i ) {
+                    if ( biggestValue < res[i][0] ) {
+                        biggestValue = res[i][0];
+                        mostProb = i;
+                    }
+                }
+                ++totalCount;
+                if( mostProb == digit ) {
+                    ++rightGuessCount;
+                    ++goodCount;
+                }
+            }
+            error.push_back( rightGuessCount / checkBatchSize );
+            cout << rightGuessCount / checkBatchSize << endl;
+
+            updateWindow( win, res );
+            // Rerender window
+            if( handleEvents( win ) == 1 ) break;
+
+        }
+
+    }
+
+    void getData ( int n ) {
+
+        // Save it to matrix 
+        img = idx.getImage(n);
+        lbl = idx.getLabel(n);
+        digit = int( lbl[0][0] );
+        exp_output.fill( 0 );
+        exp_output[0][digit] = 1;
+    }
+    
+    void updateWindow ( sf::RenderWindow& win, Matrix <float> results ) {
+        win.clear( sf::Color( 51, 51, 51 ) );
+        drawImage( win, img );
+        drawText( win, 10 , 300, "Current digit: " + to_string( digit ) );
+        drawText( win, 10, 400, "Error: " + to_string( error.back() ) );
+        drawText( win, 10, 450, "Good: " + to_string( goodCount ) );
+        drawText( win, 10, 500, "Total: " + to_string( totalCount ) );
+        drawText( win, 10, 550, "Ratio: " + to_string( 100 * float( goodCount ) / totalCount ) + "%" );
+        drawOutput( win, 500, 10, 20, results.T() );
+    }
+    /*
     Epoch() {
         std::thread t1( log( {16, 16, 16}, 0.02 ) );
         std::thread t2( log( {16, 16, 16}, 0.01 ) );
@@ -24,36 +113,7 @@ class Epoch {
         t3.join();
         t4.join();
     }
-    void log( std::initializer_list<int> hidden, float lr ) {
-        long long n{};
-        std::ofstream fout;
-        //tworzenie nazwy pliku
-        std::string name{};
-        for ( auto i = hidden.begin(); i < hidden.end(); ++i )
-            name += std::to_string( *i )+"_";
-        name += std::to_string( int(1000*lr) );
-        //otwarcie
-        fout.open( (name + ".csv").c_str() );
-
-        NeuralNet nn( 784, hidden, 10 );
-        //trening do 5mln
-        while ( n++ < 100 ) {
-            train( nn, 50000 );
-            auto res = test( nn, 10000 );
-            fout << n*50000 << ";\t" << res.first << ";\t" << res.second << ";\n";
-        }
-        fout.close();
-        //zapisanie sieci
-        fout.open( (name +"_net.txt").c_str() );
-        auto wages = nn.getWages();
-        auto biases = nn.getBiases();
-        fout << "Wages:\n\n";
-        for ( auto& wage : wages )
-            fout << wage << std::endl;
-        fout << "\nBiases:\n\n";
-        for ( auto& bias : biases )
-            fout << bias << std::endl;
-    }
+    
 
     int getResult( Matrix<float> results ) {
         float highest{};
@@ -67,26 +127,7 @@ class Epoch {
         return index;
     }
 
-    void train( NeuralNet& nn, long amount ) {
-        Idx idx;
-        int digit;
-        Matrix <float> img;
-        Matrix <float> lbl;
-        Matrix <float> exp_output(1, 10);
-        long i = amount;
-        while ( --i ) {
-            int b = 1000;
-            while ( b-- ) {
-                int n = rand()%60000;
-                img = idx.getImage(n);
-                lbl = idx.getLabel(n);
-                digit = int( lbl[0][0] );
-                exp_output.fill( 0 );
-                exp_output[0][digit] = 1;
-                nn.backpropagate( reshapeMatrix( img ).T(), exp_output.T() );
-            }
-        }
-    }
+
 
     std::pair<double, double> test( NeuralNet& nn, int amount ) {
         double error{};
@@ -103,4 +144,7 @@ class Epoch {
         }
         return std::pair(error/amount, double(good)/total*100);
     }
-}
+    */
+};
+
+#endif

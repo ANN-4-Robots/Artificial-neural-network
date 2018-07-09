@@ -1,4 +1,5 @@
-
+#ifndef IDX_HPP_
+#define IDX_HPP_
 using namespace std;
 
 class Idx {
@@ -61,3 +62,5 @@ class Idx {
         return value;
     }
 };
+
+#endif
