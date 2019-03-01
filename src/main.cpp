@@ -18,7 +18,7 @@
 using namespace std;
 
 int train(NeuralNet& nn, int amount);
-int getResult(Matrix<float> results);
+int getResult(Matrixf results);
 
 int main() {
     srand(time(NULL));
@@ -29,9 +29,6 @@ int main() {
     sf::RenderWindow win (sf::VideoMode(800, 800), "Neural Net");
 
     epoch.train(nn, win);
-    
-    // Flag used to toggle rendering window each time
-    // bool _display = true;
 
     win.clear(sf::Color(51, 51, 51));
     drawText(win, 10, 600, "Press ENTER to load pre-learned Network");
@@ -64,9 +61,46 @@ int main() {
                 win.display();
         }
     }
-/*
+    return 0;
+}
+// Functions
+    int getResult(Matrix<float> results) {
+        float highest{};
+        int index;
+        for (int i = 0; i < results.getSize().first ; ++i) {
+            if (results[i][0] > highest) {
+                highest = results[i][0];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    int train(NeuralNet& nn, int amount) {
+        Idx idx;
+        int digit;
+        Matrixf img;
+        Matrixf lbl;
+        Matrixf exp_output(1, 10);
+        // Pre training loop
+        long i = amount;
+        while (--i) {
+            int n = rand()%60000;
+            img = idx.getImage(n);
+            // cout << img << endl;
+            lbl = idx.getLabel(n);
+            digit = int(lbl[0][0]);
+            exp_output.fill(0);
+            exp_output[0][digit] = 1;
+            nn.backpropagate(reshapeMatrix(img).T(), exp_output.T());
+        }
+        return amount;
+    }
+
+// OLD MAIN -------------------------------------------------------------------
+    /*
     nn.loadFromFile("16_16_01_net.txt");
-// Trening i wyświetlanie
+    // Trening i wyświetlanie
     int count{}, n{}, good{}, total{};
     try {
         Idx idx;
@@ -132,42 +166,6 @@ int main() {
         std::cout << err << std::endl;
     }
 */
-    return 0;
-}
-
-// Functions
-    int getResult(Matrix<float> results) {
-        float highest{};
-        int index;
-        for (int i = 0; i < results.getSize().first ; ++i) {
-            if (results[i][0] > highest) {
-                highest = results[i][0];
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    // int train(NeuralNet& nn, int amount) {
-    //     Idx idx;
-    //     int digit;
-    //     Matrixf img;
-    //     Matrixf lbl;
-    //     Matrixf exp_output(1, 10);
-    //     // Pre training loop
-    //     long i = amount;
-    //     while (--i) {
-    //         int n = rand()%60000;
-    //         img = idx.getImage(n);
-    //         // cout << img << endl;
-    //         lbl = idx.getLabel(n);
-    //         digit = int(lbl[0][0]);
-    //         exp_output.fill(0);
-    //         exp_output[0][digit] = 1;
-    //         nn.backpropagate(reshapeMatrix(img).T(), exp_output.T());
-    //     }
-    //     return amount;
-    // }
 
 // XOR -------------------------------------------------------------------------
     // std::vector<Matrix<float>> trainSet;
