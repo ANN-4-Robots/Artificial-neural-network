@@ -19,7 +19,7 @@ class fpsClock {
     sf::Time prevTime;
 
     public:
-    fpsClock( int skipTime_ );
+    fpsClock(int skipTime_);
     bool tick();
     double interpolation();
 };

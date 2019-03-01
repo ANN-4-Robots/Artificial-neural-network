@@ -17,16 +17,16 @@ const float H = -50;
 
 const float Bias = 1;
 
-float f1( float x ) {
+float f1(float x) {
     return A* x + B;
 }
-float f2( float x ) {
+float f2(float x) {
     return C* x + D;
 }
-float f3( float x ) {
+float f3(float x) {
     return E* x + F;
 }
-float f4( float x ) {
+float f4(float x) {
     return G* x + H;
 }
 
@@ -37,7 +37,7 @@ struct Point {
     Point() {
         coords = Matrix<float>{ {float(rand()%width - width/2)}, {float(rand()%height - width/2)} };
     }
-    Point( float _x, float _y ) {
+    Point(float _x, float _y) {
         coords = { {_x}, {_y} };
     }
 };
@@ -48,38 +48,38 @@ struct TrainP :public Point {
 
     TrainP() : Point() {
         // SET UP THE EXPECTED AREA
-        if ( coords[1][0] < f1( coords[0][0] ) && coords[1][0] > f2( coords[0][0] ) )
+        if (coords[1][0] < f1(coords[0][0]) && coords[1][0] > f2(coords[0][0]))
             isAbove = Matrix<float>({{1},{1}});
-        else if ( coords[1][0] > f1( coords[0][0] ) && coords[1][0] > f2( coords[0][0] ) )
+        else if (coords[1][0] > f1(coords[0][0]) && coords[1][0] > f2(coords[0][0]))
             isAbove = Matrix<float>({{1},{0}});
-        else if ( coords[1][0] < f1( coords[0][0] ) && coords[1][0] < f2( coords[0][0] ) )
+        else if (coords[1][0] < f1(coords[0][0]) && coords[1][0] < f2(coords[0][0]))
             isAbove = Matrix<float>({{0},{1}});
         else
             isAbove = Matrix<float>({{0},{0}});
 
-        if ( isAbove[0][0] && isAbove[1][0] )
-            body.setFillColor( sf::Color(0,255,0) );
+        if (isAbove[0][0] && isAbove[1][0])
+            body.setFillColor(sf::Color(0,255,0));
 
-        body.setRadius( 2 );
-        body.setPosition( coords[0][0]+width/2, height/2-coords[1][0] );
+        body.setRadius(2);
+        body.setPosition(coords[0][0]+width/2, height/2-coords[1][0]);
     }
 
-    void color( int col = 0 ) {
-        switch ( col ) {
+    void color(int col = 0) {
+        switch (col) {
             case 0:
-                body.setFillColor( sf::Color(0,255,0) );
+                body.setFillColor(sf::Color(0,255,0));
                 break;
             case 1:
-                body.setFillColor( sf::Color(255,0,0) );
+                body.setFillColor(sf::Color(255,0,0));
                 break;
             case 2:
-                body.setFillColor( sf::Color(100,100,0) );
+                body.setFillColor(sf::Color(100,100,0));
                 break;
         }
     }
 
-    void draw( sf::RenderWindow& win ) {
-        win.draw( body );
+    void draw(sf::RenderWindow& win) {
+        win.draw(body);
     }
 };
 

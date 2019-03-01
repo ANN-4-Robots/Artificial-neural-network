@@ -13,27 +13,27 @@ class Idx {
 
     public:
     Idx() {
-        _label.open( _labelName );
-        _image.open( _imageName );
-        if( !_label.is_open() ) throw "CANNOT OPEN " + _labelName;
-        if( !_image.is_open() ) throw "CANNOT OPEN " + _imageName;
+        _label.open(_labelName);
+        _image.open(_imageName);
+        if(!_label.is_open()) throw "CANNOT OPEN " + _labelName;
+        if(!_image.is_open()) throw "CANNOT OPEN " + _imageName;
     }
 
 
     Matrix <float> getImage(int n) {
 
-        Matrix <float> image( 28, 28 );
+        Matrix <float> image(28, 28);
         char value[1];
         //float res;
 
-        for (int i = 0; i < 28; ++i ) {     //Cols
-            for (int j = 0; j < 28; ++j ) { //Rows
+        for (int i = 0; i < 28; ++i) {     //Cols
+            for (int j = 0; j < 28; ++j) { //Rows
             // Move indexer to pixel in i column in j row
-            _image.seekg( 784 * n + 16 + 28 * i + j );
-            _image.read( value, 1 );   
+            _image.seekg(784 * n + 16 + 28 * i + j);
+            _image.read(value, 1);   
 
 
-            float res = int( static_cast<unsigned char>( value[0] ) );
+            float res = int(static_cast<unsigned char>(value[0]));
             // cout << res << "\n";
             image[i][j] = res;
             }
@@ -41,23 +41,23 @@ class Idx {
         return image;
     }
 
-    Matrix <float> getLabel( int n ) {
+    Matrix <float> getLabel(int n) {
         char value[1];
         
-        _label.seekg( n + 8 );
-        _label.read( value, sizeof( value ) );   
+        _label.seekg(n + 8);
+        _label.read(value, sizeof(value));   
 
         // Multistep conversion from char to float
-        float res = int( *value );
+        float res = int(*value);
         
         return Matrix <float> {{ res }};
     }
 
-    int convert( char *buffer, int size ) {
+    int convert(char *buffer, int size) {
         // Convert multiple bytes to one int
         int value{};
-        for( int i = 0; i < size; ++i ) {
-            value += buffer[i] << ( 8 * ( size - i - 1 ));
+        for(int i = 0; i < size; ++i) {
+            value += buffer[i] << (8 * (size - i - 1));
         }
         return value;
     }
