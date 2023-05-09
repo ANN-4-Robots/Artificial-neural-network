@@ -1,57 +1,85 @@
 #ifndef POINT_HPP_
 #define POINT_HPP_
 
-const int width = 800, height = 800;
+const int width = 300, height = 300;
 
-const float A = 0.25;
-const float B = 200;
+const float A = 1;
+const float B = 50;
+
+const float C = 1;
+const float D = -50;
+
+const float E = -2;
+const float F = 50;
+
+const float G = -2;
+const float H = -50;
+
 const float Bias = 1;
 
-float f( int x ) {
-    return A*x + B;
+float f1(float x) {
+    return A* x + B;
+}
+float f2(float x) {
+    return C* x + D;
+}
+float f3(float x) {
+    return E* x + F;
+}
+float f4(float x) {
+    return G* x + H;
 }
 
+
 struct Point {
-    std::vector<int> coords;
+    Matrix<float> coords;
 
     Point() {
-        coords = { rand()%width - width/2, rand()%height - width/2 };
+        coords = Matrix<float>{ {float(rand()%width - width/2)}, {float(rand()%height - width/2)} };
     }
-    Point( int _x, int _y ) {
-        coords = { _x, _y };
+    Point(float _x, float _y) {
+        coords = { {_x}, {_y} };
     }
 };
 
 struct TrainP :public Point {
-    bool isAbove;
+    Matrix<float> isAbove;
     sf::CircleShape body;
 
     TrainP() : Point() {
-        ( coords[1] < f( coords[0] ) ) ?
-            isAbove = false :
-            isAbove = true;
-        coords.push_back( Bias );
-
-        if ( !isAbove )
-            body.setFillColor( sf::Color(0,255,0) );
-        // else
-        // body.setFillColor( sf::Color(255,0,0) );
-        // std::cout << "X: " << coords[0] << "\t Y: " << coords[1] << "\t ABOVE: " << isAbove << "\n";
-
-        body.setRadius( 2 );
-        body.setPosition( coords[0]+width/2, height/2-coords[1] );
-        // body.setFillColor( sf::Color(255,0,0) );
-    }
-
-    void color( bool col = true ) {
-        if ( col )
-            body.setFillColor( sf::Color(0,255,0) );
+        // SET UP THE EXPECTED AREA
+        if (coords[1][0] < f1(coords[0][0]) && coords[1][0] > f2(coords[0][0]))
+            isAbove = Matrix<float>({{1},{1}});
+        else if (coords[1][0] > f1(coords[0][0]) && coords[1][0] > f2(coords[0][0]))
+            isAbove = Matrix<float>({{1},{0}});
+        else if (coords[1][0] < f1(coords[0][0]) && coords[1][0] < f2(coords[0][0]))
+            isAbove = Matrix<float>({{0},{1}});
         else
-            body.setFillColor( sf::Color(255,0,0) );
+            isAbove = Matrix<float>({{0},{0}});
+
+        if (isAbove[0][0] && isAbove[1][0])
+            body.setFillColor(sf::Color(0,255,0));
+
+        body.setRadius(2);
+        body.setPosition(coords[0][0]+width/2, height/2-coords[1][0]);
     }
 
-    void draw( sf::RenderWindow& win ) {
-        win.draw( body );
+    void color(int col = 0) {
+        switch (col) {
+            case 0:
+                body.setFillColor(sf::Color(0,255,0));
+                break;
+            case 1:
+                body.setFillColor(sf::Color(255,0,0));
+                break;
+            case 2:
+                body.setFillColor(sf::Color(100,100,0));
+                break;
+        }
+    }
+
+    void draw(sf::RenderWindow& win) {
+        win.draw(body);
     }
 };
 
